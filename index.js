@@ -1,19 +1,27 @@
 (async () => {
-
-
-    var user = "user"
-    var tag = "tag"
-
-
-    var rank,
-        rr,
-        rankpng,
-        lastgame
     var color = require("./colors.js")
+        , fs = require('fs');
     var clientid = "996069918984376450"
     const https = require('https');
     const Discord = require('discord-rpc')
     const rpc = new Discord.Client({ transport: 'ipc' });
+    const path = './player.json'
+    var rank,
+        rr,
+        rankpng,
+        lastgame,
+        user,
+        tag
+
+    rawdata = fs.readFileSync(path, 'utf-8');
+    data = JSON.parse(rawdata);
+    user = data.user
+    tag = data.tag
+
+    if (tag == "user") console.log(color.Cyan("\n\nOops, it seems like you forgot to put your user at player.json"));
+    if (tag == "tag") console.log(color.Cyan("\n\nOops, it seems like you forgot to put your tag at player.json"));
+    if (tag == "user" || tag == "tag") process.exit();
+
 
     console.log(
         color.Cyan(
@@ -25,10 +33,10 @@
     Discord.register(clientid);
 
     rpc.login({ clientId: clientid }).catch(err => console.log(
-        color.Red("We have encountered an error. best you can do is" + "\n" + 
-        "- restart discord" + "\n" +
-        "- check your internet connection")
-        ))
+        color.Red("We have encountered an error. best you can do is" + "\n" +
+            "- restart discord" + "\n" +
+            "- check your internet connection")
+    ))
     rpc.on('ready', async () => {
         console.log(
             color.Cyan(
@@ -58,6 +66,11 @@
     }
 
     async function getinfo() {
+        rawdata = fs.readFileSync(path, 'utf-8');
+        data = JSON.parse(rawdata);
+        user = data.user
+        tag = data.tag
+
         let first = new Promise((resolve, reject) => {
             https.get(`https://api.henrikdev.xyz/valorant/v1/mmr/ap/${user}/${tag}`, (res) => {
                 res.setEncoding('utf8');
